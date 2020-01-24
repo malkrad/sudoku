@@ -1,0 +1,12 @@
+.SudokuBoard {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(9em, 12vw));
+	grid-auto-rows: minmax(9em, 12vw);
+	grid-gap: 3px;
+	margin: 0 auto;
+}
+
+/* Just to make the grid visible */
+.SudokuBoard > * {
+	background: rgba(0, 0, 0, 0.1);
+}

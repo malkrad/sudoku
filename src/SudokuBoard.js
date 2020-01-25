@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import SubGrid from './SubGrid';
+import Subgrid from './Subgrid';
 import './SudokuBoard.css';
 
 export class SudokuBoard extends Component {
 	static defaultProps = {
-		subGrids: new Array(9).fill(new Array(9).fill(0))
+		subgrids: new Array(9).fill(new Array(9).fill(0))
 	};
 	render() {
-		const subGrids = this.props.subGrids.map((subGrid, idx) => <SubGrid idx={idx} key={idx} cells={subGrid} />);
-		return <div className="SudokuBoard">{subGrids}</div>;
+		const subgrids = this.props.subgrids.map((subgrid, idx) => <Subgrid idx={idx} key={idx} cells={subgrid} handleClick={this.props.handleClick} />);
+		return <div className="SudokuBoard">{subgrids}</div>;
 	}
 }
 

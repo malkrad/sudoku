@@ -12,8 +12,10 @@ export class Cell extends Component {
 	}
 
 	render() {
+		let className = 'Cell';
+		if (this.props.focused) className += ' focused';
 		return (
-			<div className="Cell" onClick={this.handleClick}>
+			<div className={className} onClick={this.handleClick}>
 				{this.props.num !== 0 ? this.props.num : ''}
 			</div>
 		);

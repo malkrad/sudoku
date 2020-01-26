@@ -90,7 +90,11 @@ export class Game extends Component {
 				<header>
 					<h1>Sudoku JS</h1>
 				</header>
-				<SudokuBoard subgrids={this.state.cells} handleClick={this.setFocus} />
+				<SudokuBoard
+					subgrids={this.state.cells}
+					handleClick={this.setFocus}
+					focusedCell={this.state.focusedCell}
+				/>
 			</div>
 		);
 	}

@@ -7,8 +7,18 @@ export class SudokuBoard extends Component {
 		subgrids: new Array(9).fill(new Array(9).fill(0))
 	};
 	render() {
+		let focusedSubgrid, focusedCell;
+		if (this.props.focusedCell) {
+			[ focusedSubgrid, focusedCell ] = this.props.focusedCell;
+		}
 		const subgrids = this.props.subgrids.map((subgrid, idx) => (
-			<Subgrid idx={idx} key={idx} cells={subgrid} handleClick={this.props.handleClick} />
+			<Subgrid
+				idx={idx}
+				key={idx}
+				cells={subgrid}
+				handleClick={this.props.handleClick}
+				focusedCell={focusedSubgrid === idx ? focusedCell : undefined}
+			/>
 		));
 		return <div className="SudokuBoard">{subgrids}</div>;
 	}

@@ -18,7 +18,13 @@ export class SubGrid extends Component {
 
 	render() {
 		const cells = this.props.cells.map((cell, idx) => (
-			<Cell idx={idx} key={idx} num={cell} handleClick={this.cellClicked} />
+			<Cell
+				idx={idx}
+				key={idx}
+				num={cell}
+				handleClick={this.cellClicked}
+				focused={this.props.focusedCell === idx}
+			/>
 		));
 		return <div className="Subgrid">{cells}</div>;
 	}

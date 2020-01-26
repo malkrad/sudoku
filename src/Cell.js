@@ -14,6 +14,8 @@ export class Cell extends Component {
 	render() {
 		let className = 'Cell';
 		if (this.props.focused) className += ' focused';
+		if (this.props.wrongCell) className += ' wrongCell';
+		if (this.props.causingError) className += ' causingError';
 		return (
 			<div className={className} onClick={this.handleClick}>
 				{this.props.num !== 0 ? this.props.num : ''}

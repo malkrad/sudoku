@@ -16,6 +16,8 @@ export class Game extends Component {
 				[ 7, 0, 0, 0, 0, 8, 0, 0, 6 ],
 				[ 0, 0, 8, 0, 0, 0, 0, 0, 0 ]
 			],
+			wrongCells: new Array(9).fill(new Array(9).fill(false)),
+			causingError: new Array(9).fill(new Array(9).fill(false)),
 			focusedCell: undefined
 		};
 		this.setFocus = this.setFocus.bind(this);
@@ -65,14 +67,77 @@ export class Game extends Component {
 		const block = this.getBlock(subgrid);
 		const row = this.getRow(subgrid, cell);
 		const col = this.getCol(subgrid, cell);
+		let toColor = { block: false, row: false, col: false };
 		if (block.filter((x) => x === value).length >= 2) {
 			console.log('Doubles in block');
+			toColor.block = true;
 		}
 		if (row.filter((x) => x === value).length >= 2) {
 			console.log('Doubles in row');
+			toColor.row = true;
 		}
 		if (col.filter((x) => x === value).length >= 2) {
 			console.log('Doubles in col');
+			toColor.col = true;
+		}
+		if (toColor.block || toColor.row || toColor.col) {
+			this.colorWrongCells(value, subgrid, cell, toColor);
+		}
+	}
+
+	colorWrongCells(value, subgrid, cell, toColor) {
+		if (toColor.block) {
+			let { wrongCells, causingError } = this.state;
+			wrongCells[subgrid] = new Array(9).fill(true);
+			causingError[subgrid] = causingError[subgrid].map(
+				(cellValue, idx) => (this.state.cells[subgrid][idx] === value ? true : cellValue)
+			);
+			this.setState({ wrongCells: wrongCells, causingError: causingError });
+		}
+		if (toColor.row) {
+			let { wrongCells, causingError } = this.state;
+			wrongCells = wrongCells.map(
+				(s, idx) =>
+					Math.floor(idx / 3) === Math.floor(subgrid / 3)
+						? wrongCells[idx].map(
+								(cellValue, idx) => (Math.floor(idx / 3) === Math.floor(cell / 3) ? true : cellValue)
+							)
+						: s
+			);
+			causingError = causingError.map(
+				(s, subIdx) =>
+					Math.floor(subIdx / 3) === Math.floor(subgrid / 3)
+						? causingError[subIdx].map(
+								(cellValue, cellIdx) =>
+									Math.floor(cellIdx / 3) === Math.floor(cell / 3) &&
+									this.state.cells[subIdx][cellIdx] === value
+										? true
+										: cellValue
+							)
+						: s
+			);
+			this.setState({ wrongCells: wrongCells, causingError: causingError });
+		}
+		if (toColor.col) {
+			let { wrongCells, causingError } = this.state;
+			wrongCells = wrongCells.map(
+				(s, idx) =>
+					idx % 3 === subgrid % 3
+						? wrongCells[idx].map((cellValue, idx) => (idx % 3 === cell % 3 ? true : cellValue))
+						: s
+			);
+			causingError = causingError.map(
+				(s, subIdx) =>
+					subIdx % 3 === subgrid % 3
+						? causingError[subIdx].map(
+								(cellValue, cellIdx) =>
+									cellIdx % 3 === cell % 3 && this.state.cells[subIdx][cellIdx] === value
+										? true
+										: cellValue
+							)
+						: s
+			);
+			this.setState({ wrongCells: wrongCells, causingError: causingError });
 		}
 	}
 
@@ -94,6 +159,8 @@ export class Game extends Component {
 					subgrids={this.state.cells}
 					handleClick={this.setFocus}
 					focusedCell={this.state.focusedCell}
+					wrongCells={this.state.wrongCells}
+					causingError={this.state.causingError}
 				/>
 			</div>
 		);

@@ -24,6 +24,8 @@ export class SubGrid extends Component {
 				num={cell}
 				handleClick={this.cellClicked}
 				focused={this.props.focusedCell === idx}
+				wrongCell={this.props.wrongCells[idx]}
+				causingError={this.props.causingError[idx]}
 			/>
 		));
 		return <div className="Subgrid">{cells}</div>;

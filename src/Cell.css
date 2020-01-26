@@ -10,11 +10,21 @@
 
 .Cell:hover {
 	cursor: pointer;
-	border-bottom: 4px #06acf1 solid;
-	border-right: 4px #06acf1 solid;
+	border-bottom: 4px #6495ed solid;
+	border-right: 4px #6495ed solid;
 }
 
 .focused {
-	border-top: 4px #cf5f3b solid;
-	border-left: 4px #cf5f3b solid;
+	border-top: 4px #4b6ba8 solid;
+	border-left: 4px #4b6ba8 solid;
+}
+
+.wrongCell {
+	background-color: #e9cabf;
+}
+
+.causingError {
+	font-weight: bold;
+	font-size: larger;
+	color: #8b0000;
 }

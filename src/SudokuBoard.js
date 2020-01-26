@@ -18,6 +18,8 @@ export class SudokuBoard extends Component {
 				cells={subgrid}
 				handleClick={this.props.handleClick}
 				focusedCell={focusedSubgrid === idx ? focusedCell : undefined}
+				wrongCells={this.props.wrongCells[idx]}
+				causingError={this.props.causingError[idx]}
 			/>
 		));
 		return <div className="SudokuBoard">{subgrids}</div>;

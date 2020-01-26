@@ -7,7 +7,9 @@ export class SudokuBoard extends Component {
 		subgrids: new Array(9).fill(new Array(9).fill(0))
 	};
 	render() {
-		const subgrids = this.props.subgrids.map((subgrid, idx) => <Subgrid idx={idx} key={idx} cells={subgrid} handleClick={this.props.handleClick} />);
+		const subgrids = this.props.subgrids.map((subgrid, idx) => (
+			<Subgrid idx={idx} key={idx} cells={subgrid} handleClick={this.props.handleClick} />
+		));
 		return <div className="SudokuBoard">{subgrids}</div>;
 	}
 }

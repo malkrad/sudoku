@@ -12,7 +12,11 @@ export class Cell extends Component {
 	}
 
 	render() {
-		return <div className="Cell" onClick={this.handleClick}>{this.props.num !== 0 ? this.props.num : ''}</div>;
+		return (
+			<div className="Cell" onClick={this.handleClick}>
+				{this.props.num !== 0 ? this.props.num : ''}
+			</div>
+		);
 	}
 }
 

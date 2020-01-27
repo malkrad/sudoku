@@ -24,6 +24,7 @@ export class Game extends Component {
 		this.setFocus = this.setFocus.bind(this);
 		this.changeCell = this.changeCell.bind(this);
 		this.handleNumberDown = this.handleNumberDown.bind(this);
+		this.clearBoard = this.clearBoard.bind(this);
 	}
 
 	setFocus(subgrid, cell) {
@@ -171,6 +172,16 @@ export class Game extends Component {
 		document.removeEventListener('keydown', this.handleNumberDown);
 	}
 
+	clearBoard() {
+		this.setState({
+			cells: this.state.cells.map((s, subIdx) =>
+				s.map((c, cellIdx) => (this.state.immutable[subIdx][cellIdx] ? c : 0))
+			),
+			wrongCells: new Array(9).fill(new Array(9).fill(false)),
+			causingError: new Array(9).fill(new Array(9).fill(false))
+		});
+	}
+
 	render() {
 		return (
 			<div>
@@ -185,6 +196,7 @@ export class Game extends Component {
 					causingError={this.state.causingError}
 					immutable={this.state.immutable}
 				/>
+				<button onClick={this.clearBoard}>Clear</button>
 			</div>
 		);
 	}

@@ -20,6 +20,7 @@ export class SudokuBoard extends Component {
 				focusedCell={focusedSubgrid === idx ? focusedCell : undefined}
 				wrongCells={this.props.wrongCells[idx]}
 				causingError={this.props.causingError[idx]}
+				immutable={this.props.immutable[idx]}
 			/>
 		));
 		return <div className="SudokuBoard">{subgrids}</div>;

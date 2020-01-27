@@ -13,6 +13,8 @@ export class Cell extends Component {
 
 	render() {
 		let className = 'Cell';
+		if (this.props.immutable) className += ' immutable';
+		else className += ' mutable';
 		if (this.props.focused) className += ' focused';
 		if (this.props.wrongCell) className += ' wrongCell';
 		if (this.props.causingError) className += ' causingError';

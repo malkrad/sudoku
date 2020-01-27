@@ -26,6 +26,7 @@ export class SubGrid extends Component {
 				focused={this.props.focusedCell === idx}
 				wrongCell={this.props.wrongCells[idx]}
 				causingError={this.props.causingError[idx]}
+				immutable={this.props.immutable[idx]}
 			/>
 		));
 		return <div className="Subgrid">{cells}</div>;

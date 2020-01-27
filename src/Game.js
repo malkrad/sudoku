@@ -16,6 +16,7 @@ export class Game extends Component {
 				[ 7, 0, 0, 0, 0, 8, 0, 0, 6 ],
 				[ 0, 0, 8, 0, 0, 0, 0, 0, 0 ]
 			],
+			immutable: new Array(9).fill(new Array(9).fill(false)),
 			wrongCells: new Array(9).fill(new Array(9).fill(false)),
 			causingError: new Array(9).fill(new Array(9).fill(false)),
 			focusedCell: undefined
@@ -26,7 +27,9 @@ export class Game extends Component {
 	}
 
 	setFocus(subgrid, cell) {
-		this.setState({ focusedCell: [ subgrid, cell ] });
+		if (!this.state.immutable[subgrid][cell]) {
+			this.setState({ focusedCell: [ subgrid, cell ] });
+		}
 	}
 
 	changeCell(subgrid, cell, newNum) {
@@ -40,7 +43,7 @@ export class Game extends Component {
 		// Since it can't be catched by isNan on its own.
 		if (this.state.focusedCell && !isNaN(parseInt(evt.key))) {
 			this.changeCell(...this.state.focusedCell, parseInt(evt.key));
-			this.checkCell(...this.state.focusedCell);
+			this.checkConflicts(...this.state.focusedCell);
 		}
 	}
 
@@ -69,33 +72,25 @@ export class Game extends Component {
 		const col = this.getCol(subgrid, cell);
 		let toColor = { block: false, row: false, col: false };
 		if (block.filter((x) => x === value).length >= 2) {
-			console.log('Doubles in block');
 			toColor.block = true;
 		}
 		if (row.filter((x) => x === value).length >= 2) {
-			console.log('Doubles in row');
 			toColor.row = true;
 		}
 		if (col.filter((x) => x === value).length >= 2) {
-			console.log('Doubles in col');
 			toColor.col = true;
 		}
-		if (toColor.block || toColor.row || toColor.col) {
-			this.colorWrongCells(value, subgrid, cell, toColor);
-		}
+		return [ toColor.block || toColor.row || toColor.col, toColor ];
 	}
 
-	colorWrongCells(value, subgrid, cell, toColor) {
+	findWrongCells(value, subgrid, cell, toColor, wrongCells, causingError) {
 		if (toColor.block) {
-			let { wrongCells, causingError } = this.state;
 			wrongCells[subgrid] = new Array(9).fill(true);
 			causingError[subgrid] = causingError[subgrid].map(
 				(cellValue, idx) => (this.state.cells[subgrid][idx] === value ? true : cellValue)
 			);
-			this.setState({ wrongCells: wrongCells, causingError: causingError });
 		}
 		if (toColor.row) {
-			let { wrongCells, causingError } = this.state;
 			wrongCells = wrongCells.map(
 				(s, idx) =>
 					Math.floor(idx / 3) === Math.floor(subgrid / 3)
@@ -116,10 +111,8 @@ export class Game extends Component {
 							)
 						: s
 			);
-			this.setState({ wrongCells: wrongCells, causingError: causingError });
 		}
 		if (toColor.col) {
-			let { wrongCells, causingError } = this.state;
 			wrongCells = wrongCells.map(
 				(s, idx) =>
 					idx % 3 === subgrid % 3
@@ -137,11 +130,40 @@ export class Game extends Component {
 							)
 						: s
 			);
-			this.setState({ wrongCells: wrongCells, causingError: causingError });
 		}
+		return [ wrongCells, causingError ];
+	}
+
+	checkConflicts() {
+		let { cells } = this.state;
+		let wrongCells = new Array(9).fill(new Array(9).fill(false));
+		let causingError = new Array(9).fill(new Array(9).fill(false));
+		cells.map((s, subIdx) =>
+			s.map((c, cellIdx) => {
+				if (c !== 0) {
+					const [ status, toColor ] = this.checkCell(subIdx, cellIdx);
+					if (status) {
+						[ wrongCells, causingError ] = this.findWrongCells(
+							c,
+							subIdx,
+							cellIdx,
+							toColor,
+							wrongCells,
+							causingError
+						);
+					}
+				}
+			})
+		);
+		this.setState({ wrongCells: wrongCells, causingError: causingError });
 	}
 
 	componentDidMount() {
+		this.setState({
+			immutable: this.state.immutable.map((s, subIdx) =>
+				s.map((c, cellIdx) => (this.state.cells[subIdx][cellIdx] ? true : false))
+			)
+		});
 		document.addEventListener('keydown', this.handleNumberDown);
 	}
 
@@ -161,6 +183,7 @@ export class Game extends Component {
 					focusedCell={this.state.focusedCell}
 					wrongCells={this.state.wrongCells}
 					causingError={this.state.causingError}
+					immutable={this.state.immutable}
 				/>
 			</div>
 		);

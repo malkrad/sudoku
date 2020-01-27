@@ -3,15 +3,20 @@
 	justify-content: center;
 	align-items: center;
 	border: 1px white solid;
+	font-size: xx-large;
 	-webkit-transition: border 0.2s ease-out;
 	-moz-transition: border 0.2s ease-out;
 	-o-transition: border 0.2s ease-out;
 }
 
-.Cell:hover {
+.mutable:hover {
 	cursor: pointer;
 	border-bottom: 4px #6495ed solid;
 	border-right: 4px #6495ed solid;
+}
+
+.immutable {
+	background-color: #aaa;
 }
 
 .focused {
@@ -25,6 +30,5 @@
 
 .causingError {
 	font-weight: bold;
-	font-size: larger;
 	color: #8b0000;
 }

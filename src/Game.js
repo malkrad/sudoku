@@ -36,9 +36,11 @@ export class Game extends Component {
 	}
 
 	changeCell(value, subgrid, cell) {
-		let newCells = this.state.cells;
-		newCells[subgrid][cell] = value;
-		this.setState({ cells: newCells });
+		if (!this.state.immutable[subgrid][cell]) {
+			let newCells = this.state.cells;
+			newCells[subgrid][cell] = value;
+			this.setState({ cells: newCells });
+		}
 	}
 
 	handleKeyDown(evt) {
@@ -76,6 +78,8 @@ export class Game extends Component {
 					break;
 				case 'ArrowDown':
 					[ subgrid, cell ] = this.moveDown(subgrid, cell);
+					break;
+				default:
 			}
 		} else {
 			[ subgrid, cell ] = [ 0, 0 ];

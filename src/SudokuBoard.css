@@ -1,7 +1,7 @@
 .SudokuBoard {
 	display: grid;
-	height: 48vh;
-	width: 48vh;
+	height: 64vh;
+	width: 64vh;
 	grid-template-columns: repeat(3, 33.33%);
 	grid-template-rows: repeat(3, 33.33%);
 	/* grid-auto-rows: minmax(9em, 12vw); */

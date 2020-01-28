@@ -297,7 +297,7 @@ export class Game extends Component {
 		return (
 			<div>
 				<header>
-					<h1>Sudoku JS</h1>
+					<h1 id="title">Sudoku JS</h1>
 				</header>
 				<SudokuBoard
 					subgrids={this.state.cells}
@@ -307,8 +307,14 @@ export class Game extends Component {
 					causingError={this.state.causingError}
 					immutable={this.state.immutable}
 				/>
-				<button onClick={this.clearBoard}>Clear</button>
-				<button onClick={this.help}>Help</button>
+				<div className="HelperButtonsContainer">
+					<button className="HelperButtons" onClick={this.clearBoard}>
+						Clear
+					</button>
+					<button className="HelperButtons" onClick={this.help}>
+						Help
+					</button>
+				</div>
 			</div>
 		);
 	}

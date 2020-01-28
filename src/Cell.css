@@ -8,36 +8,37 @@
 	border: 1px white solid;
 	font-size: xx-large;
 	border-radius: 12px;
-	background-color: #ddd;
+	background-color: rgba(221, 221, 221, 0.3);
 	transition: all 200ms ease-out;
 }
 
 .mutable:hover {
 	cursor: pointer;
-	box-shadow: 0 0 6px #23adff;
+	box-shadow: 0 0 20px #23adff;
 }
 
 .immutable {
-	background-color: #aaa;
+	font-weight: bold;
+	background-color: rgba(0, 0, 0, 0.2);
 }
 
 .wrongCell {
 	/* background-color: #e9cabf; */
-	border-top: 4px #c45757 solid;
-	border-left: 4px #c45757 solid;
-	border-bottom: 4px #e9cabf solid;
-	border-right: 4px #e9cabf solid;
+	border-top: 4px #ff1a1a solid;
+	border-left: 4px #ff1a1a solid;
+	border-bottom: 4px #ffbfa8 solid;
+	border-right: 4px #ffbfa8 solid;
 	/* background: linear-gradient(135deg, #e9cabf 50%, #ddd 50%); */
 }
 
 .causingError {
 	font-weight: bold;
-	color: #8b0000;
+	color: #8d0f0f;
 }
 
 .focused {
-	border-top: 4px #4b6ba8 solid;
-	border-left: 4px #4b6ba8 solid;
-	border-bottom: 4px #6495ed solid;
-	border-right: 4px #6495ed solid;
+	border-top: 4px #0056f5 solid;
+	border-left: 4px #0056f5 solid;
+	border-bottom: 4px #528eff solid;
+	border-right: 4px #528eff solid;
 }

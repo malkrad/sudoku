@@ -1,34 +1,43 @@
 .Cell {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	border: 1px white solid;
 	font-size: xx-large;
-	-webkit-transition: border 0.2s ease-out;
-	-moz-transition: border 0.2s ease-out;
-	-o-transition: border 0.2s ease-out;
+	border-radius: 12px;
+	background-color: #ddd;
+	transition: all 200ms ease-out;
 }
 
 .mutable:hover {
 	cursor: pointer;
-	border-bottom: 4px #6495ed solid;
-	border-right: 4px #6495ed solid;
+	box-shadow: 0 0 6px #23adff;
 }
 
 .immutable {
 	background-color: #aaa;
 }
 
-.focused {
-	border-top: 4px #4b6ba8 solid;
-	border-left: 4px #4b6ba8 solid;
-}
-
 .wrongCell {
-	background-color: #e9cabf;
+	/* background-color: #e9cabf; */
+	border-top: 4px #c45757 solid;
+	border-left: 4px #c45757 solid;
+	border-bottom: 4px #e9cabf solid;
+	border-right: 4px #e9cabf solid;
+	/* background: linear-gradient(135deg, #e9cabf 50%, #ddd 50%); */
 }
 
 .causingError {
 	font-weight: bold;
 	color: #8b0000;
+}
+
+.focused {
+	border-top: 4px #4b6ba8 solid;
+	border-left: 4px #4b6ba8 solid;
+	border-bottom: 4px #6495ed solid;
+	border-right: 4px #6495ed solid;
 }

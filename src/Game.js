@@ -25,6 +25,8 @@ export class Game extends Component {
 		this.changeCell = this.changeCell.bind(this);
 		this.handleNumberDown = this.handleNumberDown.bind(this);
 		this.clearBoard = this.clearBoard.bind(this);
+		this.help = this.help.bind(this);
+		this.handleKeyDown = this.handleKeyDown.bind(this);
 	}
 
 	setFocus(subgrid, cell) {
@@ -33,19 +35,92 @@ export class Game extends Component {
 		}
 	}
 
-	changeCell(subgrid, cell, newNum) {
+	changeCell(value, subgrid, cell) {
 		let newCells = this.state.cells;
-		newCells[subgrid][cell] = newNum;
+		newCells[subgrid][cell] = value;
 		this.setState({ cells: newCells });
 	}
 
-	handleNumberDown(evt) {
+	handleKeyDown(evt) {
 		// Both parseInt and isNan are used to avoid Spacebar Key
 		// Since it can't be catched by isNan on its own.
-		if (this.state.focusedCell && !isNaN(parseInt(evt.key))) {
-			this.changeCell(...this.state.focusedCell, parseInt(evt.key));
-			this.checkConflicts(...this.state.focusedCell);
+		const key = evt.key;
+		const arrows = [ 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown' ];
+		if (this.state.focusedCell && !isNaN(parseInt(key))) {
+			this.handleNumberDown(parseInt(evt.key));
+		} else if (arrows.includes(key)) {
+			this.handleArrowDown(key);
 		}
+	}
+
+	handleNumberDown(value) {
+		// Both parseInt and isNan are used to avoid Spacebar Key
+		// Since it can't be catched by isNan on its own.
+		this.changeCell(value, ...this.state.focusedCell);
+		this.checkConflicts(...this.state.focusedCell);
+	}
+
+	handleArrowDown(arrow) {
+		let subgrid, cell;
+		if (this.state.focusedCell) {
+			[ subgrid, cell ] = this.state.focusedCell;
+			switch (arrow) {
+				case 'ArrowLeft':
+					[ subgrid, cell ] = this.moveLeft(subgrid, cell);
+					break;
+				case 'ArrowRight':
+					[ subgrid, cell ] = this.moveRight(subgrid, cell);
+					break;
+				case 'ArrowUp':
+					[ subgrid, cell ] = this.moveUp(subgrid, cell);
+					break;
+				case 'ArrowDown':
+					[ subgrid, cell ] = this.moveDown(subgrid, cell);
+			}
+		} else {
+			[ subgrid, cell ] = [ 0, 0 ];
+		}
+		this.setState({ focusedCell: [ subgrid, cell ] });
+	}
+
+	moveLeft(subgrid, cell) {
+		if (cell % 3 !== 0) {
+			cell--;
+		} else if (subgrid % 3 !== 0) {
+			cell += 2;
+			subgrid--;
+		}
+		return [ subgrid, cell ];
+	}
+
+	moveRight(subgrid, cell) {
+		if (cell % 3 !== 2) {
+			cell++;
+		} else if (subgrid % 3 !== 2) {
+			cell -= 2;
+			subgrid++;
+		}
+		return [ subgrid, cell ];
+	}
+
+	moveUp(subgrid, cell) {
+		if (Math.floor(cell / 3) !== 0) {
+			cell -= 3;
+		} else if (Math.floor(subgrid / 3) !== 0) {
+			cell += 6;
+			subgrid -= 3;
+		}
+		return [ subgrid, cell ];
+	}
+
+	moveDown(subgrid, cell) {
+		if (Math.floor(cell / 3) !== 2) {
+			cell += 3;
+		} else if (Math.floor(subgrid / 3) !== 2) {
+			cell -= 6;
+			subgrid += 3;
+		}
+		return [ subgrid, cell ];
 	}
 
 	getBlock(subgrid) {
@@ -139,8 +214,8 @@ export class Game extends Component {
 		let { cells } = this.state;
 		let wrongCells = new Array(9).fill(new Array(9).fill(false));
 		let causingError = new Array(9).fill(new Array(9).fill(false));
-		cells.map((s, subIdx) =>
-			s.map((c, cellIdx) => {
+		cells.forEach((s, subIdx) =>
+			s.forEach((c, cellIdx) => {
 				if (c !== 0) {
 					const [ status, toColor ] = this.checkCell(subIdx, cellIdx);
 					if (status) {
@@ -165,11 +240,11 @@ export class Game extends Component {
 				s.map((c, cellIdx) => (this.state.cells[subIdx][cellIdx] ? true : false))
 			)
 		});
-		document.addEventListener('keydown', this.handleNumberDown);
+		document.addEventListener('keydown', this.handleKeyDown);
 	}
 
 	componentWillUnmount() {
-		document.removeEventListener('keydown', this.handleNumberDown);
+		document.removeEventListener('keydown', this.handleKeyDown);
 	}
 
 	clearBoard() {
@@ -180,6 +255,38 @@ export class Game extends Component {
 			wrongCells: new Array(9).fill(new Array(9).fill(false)),
 			causingError: new Array(9).fill(new Array(9).fill(false))
 		});
+	}
+
+	solveForOne(subgrid, cell) {
+		let solutions = new Array(9).fill(0).map((_, idx) => idx + 1);
+		const block = this.getBlock(subgrid);
+		const row = this.getRow(subgrid, cell);
+		const col = this.getCol(subgrid, cell);
+		solutions = solutions.filter((c) => !block.includes(c) && !row.includes(c) && !col.includes(c));
+		return solutions;
+	}
+
+	help() {
+		const { cells, immutable } = this.state;
+		let directSolution = cells.map((s, subIdx) =>
+			s.map((c, cellIdx) => (!immutable[subIdx][cellIdx] ? this.solveForOne(subIdx, cellIdx) : []))
+		);
+		let toSolve = { subgrid: undefined, cell: undefined, value: undefined };
+		for (let subgrid = 0; subgrid < directSolution.length; subgrid++) {
+			for (let cell = 0; cell < directSolution[subgrid].length; cell++) {
+				if (directSolution[subgrid][cell].length === 1) {
+					toSolve.subgrid = subgrid;
+					toSolve.cell = cell;
+					toSolve.value = directSolution[subgrid][cell][0];
+				}
+			}
+		}
+		if (toSolve.value) {
+			this.changeCell(toSolve.value, toSolve.subgrid, toSolve.cell);
+			this.checkConflicts();
+		} else {
+			alert('No direct solutions');
+		}
 	}
 
 	render() {
@@ -197,6 +304,7 @@ export class Game extends Component {
 					immutable={this.state.immutable}
 				/>
 				<button onClick={this.clearBoard}>Clear</button>
+				<button onClick={this.help}>Help</button>
 			</div>
 		);
 	}

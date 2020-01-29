@@ -308,10 +308,10 @@ export class Game extends Component {
 					immutable={this.state.immutable}
 				/>
 				<div className="HelperButtonsContainer">
-					<button className="HelperButtons" onClick={this.clearBoard}>
+					<button className="HelperButton" onClick={this.clearBoard}>
 						Clear
 					</button>
-					<button className="HelperButtons" onClick={this.help}>
+					<button className="HelperButton" onClick={this.help}>
 						Help
 					</button>
 				</div>

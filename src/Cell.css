@@ -23,12 +23,11 @@
 }
 
 .wrongCell {
-	/* background-color: #e9cabf; */
+	background-color: rgba(161, 44, 44, 0.1);
 	border-top: 4px #ff1a1a solid;
 	border-left: 4px #ff1a1a solid;
 	border-bottom: 4px #ffbfa8 solid;
 	border-right: 4px #ffbfa8 solid;
-	/* background: linear-gradient(135deg, #e9cabf 50%, #ddd 50%); */
 }
 
 .causingError {

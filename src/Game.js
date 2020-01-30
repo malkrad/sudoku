@@ -274,34 +274,62 @@ export class Game extends Component {
 		});
 	}
 
-	solveForOne(subgrid, cell) {
+	hint() {
+		const [ foundLonelyCells, lonelyCells ] = this.findLonelyCells();
+		const [ foundLonelyValues, lonelyValues ] = this.findLonelyValues();
+		let hints = new Array(9).fill(new Array(9).fill(false));
+		hints = hints.map((subgrid, subIdx) =>
+			subgrid.map((cell, cellIdx) => lonelyCells[subIdx][cellIdx] || lonelyValues[subIdx][cellIdx])
+		);
+		if (foundLonelyCells || foundLonelyValues) {
+			this.setState({ hints: hints });
+		} else {
+			alert('No direct solutions');
+		}
+	}
+
+	// Cells that can only fit one value
+	// according to the current values of the grid
+	findLonelyCells() {
+		const { cells, immutable, hints } = this.state;
+		let hintsFound = false;
+		let solution = cells.map((subgrid, subIdx) =>
+			subgrid.map((cell, cellIdx) => (!immutable[subIdx][cellIdx] ? this.cellSolutions(subIdx, cellIdx) : []))
+		);
+		for (let subgrid = 0; subgrid < solution.length; subgrid++) {
+			for (let cell = 0; cell < solution[subgrid].length; cell++) {
+				if (solution[subgrid][cell].length === 1) {
+					hints[subgrid][cell] = true;
+					hintsFound = true;
+				}
+			}
+		}
+		return [ hintsFound, hints ];
+	}
+
+	// Values that can be fit in one place in a block, row or col
+	// according to the current values of the grid
+	findLonelyValues() {
+		const { cells, immutable, hints } = this.state;
+		let hintsFound = false;
+		let solution = cells.map((subgrid, subIdx) =>
+			subgrid.map((cell, cellIdx) => (!immutable[subIdx][cellIdx] ? this.cellSolutions(subIdx, cellIdx) : []))
+		);
+		let countedSolutions = new Array(9).fill(new Array(9).fill(0));
+		solution.forEach((subgrid, subIdx) =>
+			subgrid.forEach((cell, cellIdx) => (countedSolutions[subIdx][cell] += 1))
+		);
+		// TODO: find lonely values logic
+		return [ hintsFound, hints ];
+	}
+
+	cellSolutions(subgrid, cell) {
 		let solutions = new Array(9).fill(0).map((_, idx) => idx + 1);
 		const block = this.getBlock(subgrid);
 		const row = this.getRow(subgrid, cell);
 		const col = this.getCol(subgrid, cell);
 		solutions = solutions.filter((c) => !block.includes(c) && !row.includes(c) && !col.includes(c));
 		return solutions;
-	}
-
-	hint() {
-		const { cells, immutable, hints } = this.state;
-		let hintsFound = false;
-		let directSolution = cells.map((s, subIdx) =>
-			s.map((c, cellIdx) => (!immutable[subIdx][cellIdx] ? this.solveForOne(subIdx, cellIdx) : []))
-		);
-		for (let subgrid = 0; subgrid < directSolution.length; subgrid++) {
-			for (let cell = 0; cell < directSolution[subgrid].length; cell++) {
-				if (directSolution[subgrid][cell].length === 1) {
-					hints[subgrid][cell] = true;
-					hintsFound = true;
-				}
-			}
-		}
-		if (hintsFound) {
-			this.setState({ hints: hints });
-		} else {
-			alert('No direct solutions');
-		}
 	}
 
 	render() {

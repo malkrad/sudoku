@@ -283,6 +283,7 @@ export class Game extends Component {
 		const { result, cells } = this.solveNext(originalCells);
 		if (result) {
 			this.setState({
+				solved: true,
 				cells: cells,
 				wrongCells: new Array(9).fill(new Array(9).fill(false)),
 				causingError: new Array(9).fill(new Array(9).fill(false))

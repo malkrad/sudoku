@@ -131,9 +131,9 @@ export class Game extends Component {
 
 	checkCell(subgrid, cell) {
 		const value = this.state.cells[subgrid][cell];
-		const block = this.getBlock(subgrid);
-		const row = this.getRow(subgrid, cell);
-		const col = this.getCol(subgrid, cell);
+		const block = this.getBlock(subgrid, this.state.cells);
+		const row = this.getRow(subgrid, cell, this.state.cells);
+		const col = this.getCol(subgrid, cell, this.state.cells);
 		let wrongs = { block: false, row: false, col: false };
 		if (block.filter((x) => x === value).length >= 2) {
 			wrongs.block = true;
@@ -147,22 +147,22 @@ export class Game extends Component {
 		return [ wrongs.block || wrongs.row || wrongs.col, wrongs ];
 	}
 
-	getBlock(subgrid) {
-		return this.state.cells[subgrid];
+	getBlock(subgrid, cells) {
+		return cells[subgrid];
 	}
 
-	getRow(subgrid, cell) {
+	getRow(subgrid, cell, cells) {
 		const subgridPos = Math.floor(subgrid / 3) * 3;
-		const subgrids = this.state.cells.slice(subgridPos, subgridPos + 3);
+		const subgrids = cells.slice(subgridPos, subgridPos + 3);
 		const cellPos = Math.floor(cell / 3) * 3;
-		const cells = subgrids.map((s) => s.slice(cellPos, cellPos + 3));
-		return [].concat(...cells);
+		const row = subgrids.map((s) => s.slice(cellPos, cellPos + 3));
+		return [].concat(...row);
 	}
 
-	getCol(subgrid, cell) {
-		const subgrids = this.state.cells.filter((_, idx) => idx % 3 === subgrid % 3);
-		const cells = subgrids.map((s) => s.filter((_, idx) => idx % 3 === cell % 3));
-		return [].concat(...cells);
+	getCol(subgrid, cell, cells) {
+		const subgrids = cells.filter((_, idx) => idx % 3 === subgrid % 3);
+		const col = subgrids.map((s) => s.filter((_, idx) => idx % 3 === cell % 3));
+		return [].concat(...col);
 	}
 
 	findWrongCells(value, subgrid, cell, toCheck, wrongCells, causingError) {
@@ -277,9 +277,16 @@ export class Game extends Component {
 	}
 
 	solve() {
-		const { result, cells } = this.solveNext(this.state.cells);
+		const originalCells = this.state.cells.map((subgrid, subIdx) =>
+			subgrid.map((cell, cellIdx) => (this.state.immutable[subIdx][cellIdx] ? cell : 0))
+		);
+		const { result, cells } = this.solveNext(originalCells);
 		if (result) {
-			this.setState({ cells: cells, solved: true });
+			this.setState({
+				cells: cells,
+				wrongCells: new Array(9).fill(new Array(9).fill(false)),
+				causingError: new Array(9).fill(new Array(9).fill(false))
+			});
 		} else alert('Sorry, but something went wrong!');
 	}
 
@@ -287,7 +294,7 @@ export class Game extends Component {
 		const nextEmptyCell = this.nextEmptyCell(cells);
 		if (!nextEmptyCell) return { result: true, cells: cells };
 		let [ subgrid, cell ] = nextEmptyCell;
-		const solutions = this.cellSolutions(subgrid, cell);
+		const solutions = this.cellSolutions(subgrid, cell, cells);
 		if (!solutions.length) {
 			return { result: false, cells: cells };
 		}
@@ -329,7 +336,9 @@ export class Game extends Component {
 		const { cells, immutable, hints } = this.state;
 		let hintsFound = false;
 		let solution = cells.map((subgrid, subIdx) =>
-			subgrid.map((cell, cellIdx) => (!immutable[subIdx][cellIdx] ? this.cellSolutions(subIdx, cellIdx) : []))
+			subgrid.map(
+				(cell, cellIdx) => (!immutable[subIdx][cellIdx] ? this.cellSolutions(subIdx, cellIdx, cells) : [])
+			)
 		);
 		for (let subgrid = 0; subgrid < solution.length; subgrid++) {
 			for (let cell = 0; cell < solution[subgrid].length; cell++) {
@@ -348,7 +357,9 @@ export class Game extends Component {
 		const { cells, immutable, hints } = this.state;
 		let hintsFound = false;
 		let solution = cells.map((subgrid, subIdx) =>
-			subgrid.map((cell, cellIdx) => (!immutable[subIdx][cellIdx] ? this.cellSolutions(subIdx, cellIdx) : []))
+			subgrid.map(
+				(cell, cellIdx) => (!immutable[subIdx][cellIdx] ? this.cellSolutions(subIdx, cellIdx, cells) : [])
+			)
 		);
 		let countedSolutions = new Array(9).fill(new Array(9).fill(0));
 		solution.forEach((subgrid, subIdx) =>
@@ -358,11 +369,11 @@ export class Game extends Component {
 		return [ hintsFound, hints ];
 	}
 
-	cellSolutions(subgrid, cell) {
+	cellSolutions(subgrid, cell, cells) {
 		let solutions = new Array(9).fill(0).map((_, idx) => idx + 1);
-		const block = this.getBlock(subgrid);
-		const row = this.getRow(subgrid, cell);
-		const col = this.getCol(subgrid, cell);
+		const block = this.getBlock(subgrid, cells);
+		const row = this.getRow(subgrid, cell, cells);
+		const col = this.getCol(subgrid, cell, cells);
 		solutions = solutions.filter((c) => !block.includes(c) && !row.includes(c) && !col.includes(c));
 		return solutions;
 	}

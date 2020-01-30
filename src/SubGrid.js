@@ -20,7 +20,7 @@ export class SubGrid extends Component {
 		const cells = this.props.cells.map((cell, idx) => (
 			<Cell
 				idx={idx}
-				key={idx}
+				key={String(this.props.idx) + '-' + String(idx)}
 				num={cell}
 				handleClick={this.cellClicked}
 				focused={this.props.focusedCell === idx}

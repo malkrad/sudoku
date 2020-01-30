@@ -24,7 +24,9 @@ export class SudokuBoard extends Component {
 				hints={this.props.hints[idx]}
 			/>
 		));
-		return <div className="SudokuBoard">{subgrids}</div>;
+		let className = 'SudokuBoard';
+		this.props.solved ? (className += ' solved') : (className += ' unsolved');
+		return <div className={className}>{subgrids}</div>;
 	}
 }
 

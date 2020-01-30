@@ -20,7 +20,8 @@ export class Game extends Component {
 			immutable: new Array(9).fill(new Array(9).fill(false)),
 			wrongCells: new Array(9).fill(new Array(9).fill(false)),
 			causingError: new Array(9).fill(new Array(9).fill(false)),
-			focusedCell: undefined
+			focusedCell: undefined,
+			solved: false
 		};
 		this.setFocus = this.setFocus.bind(this);
 		this.changeCell = this.changeCell.bind(this);
@@ -275,6 +276,13 @@ export class Game extends Component {
 		});
 	}
 
+	solve() {
+		const { result, cells } = this.solveNext(this.state.cells);
+		if (result) {
+			this.setState({ cells: cells, solved: true });
+		} else alert('Sorry, but something went wrong!');
+	}
+
 	solveNext(cells) {
 		const nextEmptyCell = this.nextEmptyCell(cells);
 		if (!nextEmptyCell) return { result: true, cells: cells };
@@ -289,11 +297,6 @@ export class Game extends Component {
 			cells[subgrid][cell] = 0;
 		}
 		return { result: false, cells: cells };
-	}
-
-	solve() {
-		const { result, cells } = this.solveNext(this.state.cells);
-		result ? this.setState({ cells: cells }) : alert('Sorry, but something went wrong!');
 	}
 
 	nextEmptyCell(cells) {
@@ -378,6 +381,7 @@ export class Game extends Component {
 					causingError={this.state.causingError}
 					immutable={this.state.immutable}
 					hints={this.state.hints}
+					solved={this.state.solved}
 				/>
 				<div className="HelperButtonsContainer">
 					<button className="HelperButton" onClick={this.clearBoard}>

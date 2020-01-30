@@ -62,7 +62,7 @@ header {
 	background: linear-gradient(60deg, #f79533, #f37055, #ef4e7b, #a166ab, #5073b8, #1098ad, #07b39b, #6fba82);
 }
 
-.SudokuBoard:before {
+.unsolved:before {
 	content: '';
 	z-index: -1;
 	position: absolute;
@@ -70,6 +70,19 @@ header {
 	height: 64vh;
 	filter: blur(25px);
 	background: linear-gradient(60deg, #f79533, #f37055, #ef4e7b, #a166ab, #5073b8, #1098ad, #07b39b, #6fba82);
+}
+
+.solved:before {
+	content: '';
+	background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+	position: absolute;
+	background-size: 600%;
+	z-index: -1;
+	filter: blur(35px);
+	width: 64vh;
+	height: 64vh;
+	animation: glowing 12s linear infinite;
+	opacity: 1;
 }
 
 .SudokuBoard > * {

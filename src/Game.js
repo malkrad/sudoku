@@ -383,9 +383,9 @@ export class Game extends Component {
 					<button className="HelperButton" onClick={this.clearBoard}>
 						Clear
 					</button>
-					<button className="HelperButton" onClick={this.hint}>
+					{/* <button className="HelperButton" onClick={this.hint}>
 						Hint
-					</button>
+					</button> */}
 					<button className="HelperButton" onClick={this.solve}>
 						Solve!
 					</button>

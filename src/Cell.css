@@ -35,6 +35,10 @@
 	color: #8d0f0f;
 }
 
+.hint {
+	background-color: rgba(100, 161, 44, 0.3);
+}
+
 .focused {
 	border-top: 4px #0056f5 solid;
 	border-left: 4px #0056f5 solid;

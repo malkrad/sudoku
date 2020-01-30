@@ -27,6 +27,7 @@ export class SubGrid extends Component {
 				wrongCell={this.props.wrongCells[idx]}
 				causingError={this.props.causingError[idx]}
 				immutable={this.props.immutable[idx]}
+				hint={this.props.hints[idx]}
 			/>
 		));
 		return <div className="Subgrid">{cells}</div>;

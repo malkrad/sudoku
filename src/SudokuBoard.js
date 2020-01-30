@@ -21,6 +21,7 @@ export class SudokuBoard extends Component {
 				wrongCells={this.props.wrongCells[idx]}
 				causingError={this.props.causingError[idx]}
 				immutable={this.props.immutable[idx]}
+				hints={this.props.hints[idx]}
 			/>
 		));
 		return <div className="SudokuBoard">{subgrids}</div>;

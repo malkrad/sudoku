@@ -18,6 +18,7 @@ export class Cell extends Component {
 		if (this.props.focused) className += ' focused';
 		if (this.props.wrongCell) className += ' wrongCell';
 		if (this.props.causingError) className += ' causingError';
+		if (this.props.hint) className += ' hint';
 		return (
 			<div className={className} onClick={this.handleClick}>
 				{this.props.num !== 0 ? this.props.num : ''}

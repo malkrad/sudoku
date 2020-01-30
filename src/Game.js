@@ -16,6 +16,7 @@ export class Game extends Component {
 				[ 7, 0, 0, 0, 0, 8, 0, 0, 6 ],
 				[ 0, 0, 8, 0, 0, 0, 0, 0, 0 ]
 			],
+			hints: new Array(9).fill(new Array(9).fill(false)),
 			immutable: new Array(9).fill(new Array(9).fill(false)),
 			wrongCells: new Array(9).fill(new Array(9).fill(false)),
 			causingError: new Array(9).fill(new Array(9).fill(false)),
@@ -23,9 +24,8 @@ export class Game extends Component {
 		};
 		this.setFocus = this.setFocus.bind(this);
 		this.changeCell = this.changeCell.bind(this);
-		this.handleNumberDown = this.handleNumberDown.bind(this);
 		this.clearBoard = this.clearBoard.bind(this);
-		this.help = this.help.bind(this);
+		this.hint = this.hint.bind(this);
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 	}
 
@@ -127,6 +127,24 @@ export class Game extends Component {
 		return [ subgrid, cell ];
 	}
 
+	checkCell(subgrid, cell) {
+		const value = this.state.cells[subgrid][cell];
+		const block = this.getBlock(subgrid);
+		const row = this.getRow(subgrid, cell);
+		const col = this.getCol(subgrid, cell);
+		let wrongs = { block: false, row: false, col: false };
+		if (block.filter((x) => x === value).length >= 2) {
+			wrongs.block = true;
+		}
+		if (row.filter((x) => x === value).length >= 2) {
+			wrongs.row = true;
+		}
+		if (col.filter((x) => x === value).length >= 2) {
+			wrongs.col = true;
+		}
+		return [ wrongs.block || wrongs.row || wrongs.col, wrongs ];
+	}
+
 	getBlock(subgrid) {
 		return this.state.cells[subgrid];
 	}
@@ -145,72 +163,67 @@ export class Game extends Component {
 		return [].concat(...cells);
 	}
 
-	checkCell(subgrid, cell) {
-		const value = this.state.cells[subgrid][cell];
-		const block = this.getBlock(subgrid);
-		const row = this.getRow(subgrid, cell);
-		const col = this.getCol(subgrid, cell);
-		let toColor = { block: false, row: false, col: false };
-		if (block.filter((x) => x === value).length >= 2) {
-			toColor.block = true;
+	findWrongCells(value, subgrid, cell, toCheck, wrongCells, causingError) {
+		if (toCheck.block) {
+			[ wrongCells, causingError ] = this.findWrongCellsInBlock(value, subgrid, wrongCells, causingError);
 		}
-		if (row.filter((x) => x === value).length >= 2) {
-			toColor.row = true;
+		if (toCheck.row) {
+			[ wrongCells, causingError ] = this.findWrongCellsInRow(value, subgrid, cell, wrongCells, causingError);
 		}
-		if (col.filter((x) => x === value).length >= 2) {
-			toColor.col = true;
+		if (toCheck.col) {
+			[ wrongCells, causingError ] = this.findWrongCellsInCol(value, subgrid, cell, wrongCells, causingError);
 		}
-		return [ toColor.block || toColor.row || toColor.col, toColor ];
+		return [ wrongCells, causingError ];
 	}
 
-	findWrongCells(value, subgrid, cell, toColor, wrongCells, causingError) {
-		if (toColor.block) {
-			wrongCells[subgrid] = new Array(9).fill(true);
-			causingError[subgrid] = causingError[subgrid].map(
-				(cellValue, idx) => (this.state.cells[subgrid][idx] === value ? true : cellValue)
-			);
-		}
-		if (toColor.row) {
-			wrongCells = wrongCells.map(
-				(s, idx) =>
-					Math.floor(idx / 3) === Math.floor(subgrid / 3)
-						? wrongCells[idx].map(
-								(cellValue, idx) => (Math.floor(idx / 3) === Math.floor(cell / 3) ? true : cellValue)
-							)
-						: s
-			);
-			causingError = causingError.map(
-				(s, subIdx) =>
-					Math.floor(subIdx / 3) === Math.floor(subgrid / 3)
-						? causingError[subIdx].map(
-								(cellValue, cellIdx) =>
-									Math.floor(cellIdx / 3) === Math.floor(cell / 3) &&
-									this.state.cells[subIdx][cellIdx] === value
-										? true
-										: cellValue
-							)
-						: s
-			);
-		}
-		if (toColor.col) {
-			wrongCells = wrongCells.map(
-				(s, idx) =>
-					idx % 3 === subgrid % 3
-						? wrongCells[idx].map((cellValue, idx) => (idx % 3 === cell % 3 ? true : cellValue))
-						: s
-			);
-			causingError = causingError.map(
-				(s, subIdx) =>
-					subIdx % 3 === subgrid % 3
-						? causingError[subIdx].map(
-								(cellValue, cellIdx) =>
-									cellIdx % 3 === cell % 3 && this.state.cells[subIdx][cellIdx] === value
-										? true
-										: cellValue
-							)
-						: s
-			);
-		}
+	findWrongCellsInBlock(value, subgrid, wrongCells, causingError) {
+		wrongCells[subgrid] = new Array(9).fill(true);
+		causingError[subgrid] = causingError[subgrid].map(
+			(cellValue, idx) => (this.state.cells[subgrid][idx] === value ? true : cellValue)
+		);
+		return [ wrongCells, causingError ];
+	}
+
+	findWrongCellsInRow(value, subgrid, cell, wrongCells, causingError) {
+		wrongCells = wrongCells.map(
+			(s, idx) =>
+				Math.floor(idx / 3) === Math.floor(subgrid / 3)
+					? wrongCells[idx].map(
+							(cellValue, idx) => (Math.floor(idx / 3) === Math.floor(cell / 3) ? true : cellValue)
+						)
+					: s
+		);
+		causingError = causingError.map(
+			(s, subIdx) =>
+				Math.floor(subIdx / 3) === Math.floor(subgrid / 3)
+					? causingError[subIdx].map(
+							(cellValue, cellIdx) =>
+								Math.floor(cellIdx / 3) === Math.floor(cell / 3) &&
+								this.state.cells[subIdx][cellIdx] === value
+									? true
+									: cellValue
+						)
+					: s
+		);
+		return [ wrongCells, causingError ];
+	}
+
+	findWrongCellsInCol(value, subgrid, cell, wrongCells, causingError) {
+		wrongCells = wrongCells.map(
+			(s, idx) =>
+				idx % 3 === subgrid % 3
+					? wrongCells[idx].map((cellValue, idx) => (idx % 3 === cell % 3 ? true : cellValue))
+					: s
+		);
+		causingError = causingError.map(
+			(s, subIdx) =>
+				subIdx % 3 === subgrid % 3
+					? causingError[subIdx].map(
+							(cellValue, cellIdx) =>
+								cellIdx % 3 === cell % 3 && this.state.cells[subIdx][cellIdx] === value ? true : cellValue
+						)
+					: s
+		);
 		return [ wrongCells, causingError ];
 	}
 
@@ -218,16 +231,16 @@ export class Game extends Component {
 		let { cells } = this.state;
 		let wrongCells = new Array(9).fill(new Array(9).fill(false));
 		let causingError = new Array(9).fill(new Array(9).fill(false));
-		cells.forEach((s, subIdx) =>
-			s.forEach((c, cellIdx) => {
-				if (c !== 0) {
-					const [ status, toColor ] = this.checkCell(subIdx, cellIdx);
+		cells.forEach((subgrid, subIdx) =>
+			subgrid.forEach((cell, cellIdx) => {
+				if (cell !== 0) {
+					const [ status, toCheck ] = this.checkCell(subIdx, cellIdx);
 					if (status) {
 						[ wrongCells, causingError ] = this.findWrongCells(
-							c,
+							cell,
 							subIdx,
 							cellIdx,
-							toColor,
+							toCheck,
 							wrongCells,
 							causingError
 						);
@@ -270,24 +283,22 @@ export class Game extends Component {
 		return solutions;
 	}
 
-	help() {
-		const { cells, immutable } = this.state;
+	hint() {
+		const { cells, immutable, hints } = this.state;
+		let hintsFound = false;
 		let directSolution = cells.map((s, subIdx) =>
 			s.map((c, cellIdx) => (!immutable[subIdx][cellIdx] ? this.solveForOne(subIdx, cellIdx) : []))
 		);
-		let toSolve = { subgrid: undefined, cell: undefined, value: undefined };
 		for (let subgrid = 0; subgrid < directSolution.length; subgrid++) {
 			for (let cell = 0; cell < directSolution[subgrid].length; cell++) {
 				if (directSolution[subgrid][cell].length === 1) {
-					toSolve.subgrid = subgrid;
-					toSolve.cell = cell;
-					toSolve.value = directSolution[subgrid][cell][0];
+					hints[subgrid][cell] = true;
+					hintsFound = true;
 				}
 			}
 		}
-		if (toSolve.value) {
-			this.changeCell(toSolve.value, toSolve.subgrid, toSolve.cell);
-			this.checkConflicts();
+		if (hintsFound) {
+			this.setState({ hints: hints });
 		} else {
 			alert('No direct solutions');
 		}
@@ -306,13 +317,14 @@ export class Game extends Component {
 					wrongCells={this.state.wrongCells}
 					causingError={this.state.causingError}
 					immutable={this.state.immutable}
+					hints={this.state.hints}
 				/>
 				<div className="HelperButtonsContainer">
 					<button className="HelperButton" onClick={this.clearBoard}>
 						Clear
 					</button>
-					<button className="HelperButton" onClick={this.help}>
-						Help
+					<button className="HelperButton" onClick={this.hint}>
+						Hint
 					</button>
 				</div>
 			</div>

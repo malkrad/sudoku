@@ -26,6 +26,7 @@ export class Game extends Component {
 		this.changeCell = this.changeCell.bind(this);
 		this.clearBoard = this.clearBoard.bind(this);
 		this.hint = this.hint.bind(this);
+		this.solve = this.solve.bind(this);
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 	}
 
@@ -274,6 +275,37 @@ export class Game extends Component {
 		});
 	}
 
+	solveNext(cells) {
+		const nextEmptyCell = this.nextEmptyCell(cells);
+		if (!nextEmptyCell) return { result: true, cells: cells };
+		let [ subgrid, cell ] = nextEmptyCell;
+		const solutions = this.cellSolutions(subgrid, cell);
+		if (!solutions.length) {
+			return { result: false, cells: cells };
+		}
+		for (const solution of solutions) {
+			cells[subgrid][cell] = solution;
+			if (this.solveNext(cells).result) return { result: true, cells: cells };
+			cells[subgrid][cell] = 0;
+		}
+		return { result: false, cells: cells };
+	}
+
+	solve() {
+		const { result, cells } = this.solveNext(this.state.cells);
+		result ? this.setState({ cells: cells }) : alert('Sorry, but something went wrong!');
+	}
+
+	nextEmptyCell(cells) {
+		for (let subgrid = 0; subgrid < cells.length; subgrid++) {
+			for (let cell = 0; cell < cells[0].length; cell++) {
+				if (cells[subgrid][cell] === 0) return [ subgrid, cell ];
+			}
+		}
+
+		return null;
+	}
+
 	hint() {
 		const [ foundLonelyCells, lonelyCells ] = this.findLonelyCells();
 		const [ foundLonelyValues, lonelyValues ] = this.findLonelyValues();
@@ -353,6 +385,9 @@ export class Game extends Component {
 					</button>
 					<button className="HelperButton" onClick={this.hint}>
 						Hint
+					</button>
+					<button className="HelperButton" onClick={this.solve}>
+						Solve!
 					</button>
 				</div>
 			</div>

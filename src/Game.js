@@ -272,7 +272,8 @@ export class Game extends Component {
 				s.map((c, cellIdx) => (this.state.immutable[subIdx][cellIdx] ? c : 0))
 			),
 			wrongCells: new Array(9).fill(new Array(9).fill(false)),
-			causingError: new Array(9).fill(new Array(9).fill(false))
+			causingError: new Array(9).fill(new Array(9).fill(false)),
+			solved: false
 		});
 	}
 

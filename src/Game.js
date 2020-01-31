@@ -28,14 +28,6 @@ export class Game extends Component {
 		}
 	}
 
-	changeCell(value, subgrid, cell) {
-		if (!this.state.immutable[subgrid][cell]) {
-			let newCells = this.state.cells;
-			newCells[subgrid][cell] = value;
-			this.setState({ cells: newCells });
-		}
-	}
-
 	handleKeyDown(evt) {
 		// Both parseInt and isNan are used to avoid Spacebar Key
 		// Since it can't be catched by isNan on its own.
@@ -53,6 +45,54 @@ export class Game extends Component {
 		// Since it can't be catched by isNan on its own.
 		this.changeCell(value, ...this.state.focusedCell);
 		this.checkConflicts(...this.state.focusedCell);
+		this.checkSolved();
+	}
+
+	changeCell(value, subgrid, cell) {
+		if (!this.state.immutable[subgrid][cell]) {
+			let newCells = this.state.cells;
+			newCells[subgrid][cell] = value;
+			this.setState({ cells: newCells });
+		}
+	}
+
+	checkConflicts() {
+		let { cells } = this.state;
+		let wrongCells = new Array(9).fill(new Array(9).fill(false));
+		let causingError = new Array(9).fill(new Array(9).fill(false));
+		cells.forEach((subgrid, subIdx) =>
+			subgrid.forEach((cell, cellIdx) => {
+				if (cell !== 0) {
+					const [ status, toCheck ] = this.checkCell(subIdx, cellIdx);
+					if (status) {
+						[ wrongCells, causingError ] = this.findWrongCells(
+							cell,
+							subIdx,
+							cellIdx,
+							toCheck,
+							wrongCells,
+							causingError
+						);
+					}
+				}
+			})
+		);
+		this.setState({ wrongCells: wrongCells, causingError: causingError });
+	}
+
+	checkSolved() {
+		const { cells, wrongCells } = this.state;
+		let solved = true;
+		for (let subgrid = 0; subgrid < cells.length; subgrid++) {
+			for (let cell = 0; cell < cells[subgrid].length; cell++) {
+				if (!cells[subgrid][cell] || wrongCells[subgrid][cell]) {
+					solved = false;
+					break;
+				}
+				if (!solved) break;
+			}
+		}
+		this.setState({ solved: solved });
 	}
 
 	handleArrowDown(arrow) {
@@ -213,30 +253,6 @@ export class Game extends Component {
 					: s
 		);
 		return [ wrongCells, causingError ];
-	}
-
-	checkConflicts() {
-		let { cells } = this.state;
-		let wrongCells = new Array(9).fill(new Array(9).fill(false));
-		let causingError = new Array(9).fill(new Array(9).fill(false));
-		cells.forEach((subgrid, subIdx) =>
-			subgrid.forEach((cell, cellIdx) => {
-				if (cell !== 0) {
-					const [ status, toCheck ] = this.checkCell(subIdx, cellIdx);
-					if (status) {
-						[ wrongCells, causingError ] = this.findWrongCells(
-							cell,
-							subIdx,
-							cellIdx,
-							toCheck,
-							wrongCells,
-							causingError
-						);
-					}
-				}
-			})
-		);
-		this.setState({ wrongCells: wrongCells, causingError: causingError });
 	}
 
 	clearBoard() {

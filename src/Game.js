@@ -5,17 +5,7 @@ export class Game extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			cells: [
-				[ 2, 6, 0, 0, 0, 0, 0, 0, 0 ],
-				[ 5, 0, 0, 0, 0, 1, 0, 0, 0 ],
-				[ 0, 1, 0, 8, 0, 0, 4, 2, 0 ],
-				[ 0, 9, 4, 0, 3, 0, 0, 0, 6 ],
-				[ 1, 0, 0, 8, 4, 0, 0, 0, 0 ],
-				[ 0, 0, 0, 2, 5, 0, 0, 0, 0 ],
-				[ 0, 0, 0, 3, 0, 2, 0, 0, 5 ],
-				[ 7, 0, 0, 0, 0, 8, 0, 0, 6 ],
-				[ 0, 0, 8, 0, 0, 0, 0, 0, 0 ]
-			],
+			cells: new Array(9).fill(new Array(9).fill(0)),
 			hints: new Array(9).fill(new Array(9).fill(false)),
 			immutable: new Array(9).fill(new Array(9).fill(false)),
 			wrongCells: new Array(9).fill(new Array(9).fill(false)),
@@ -28,6 +18,7 @@ export class Game extends Component {
 		this.clearBoard = this.clearBoard.bind(this);
 		this.hint = this.hint.bind(this);
 		this.solve = this.solve.bind(this);
+		this.makeBoard = this.makeBoard.bind(this);
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 	}
 
@@ -190,9 +181,7 @@ export class Game extends Component {
 		wrongCells = wrongCells.map(
 			(s, idx) =>
 				Math.floor(idx / 3) === Math.floor(subgrid / 3)
-					? wrongCells[idx].map(
-							(cellValue, idx) => (Math.floor(idx / 3) === Math.floor(cell / 3) ? true : cellValue)
-						)
+					? wrongCells[idx].map((cellValue, idx) => (Math.floor(idx / 3) === Math.floor(cell / 3) ? true : cellValue))
 					: s
 		);
 		causingError = causingError.map(
@@ -200,8 +189,7 @@ export class Game extends Component {
 				Math.floor(subIdx / 3) === Math.floor(subgrid / 3)
 					? causingError[subIdx].map(
 							(cellValue, cellIdx) =>
-								Math.floor(cellIdx / 3) === Math.floor(cell / 3) &&
-								this.state.cells[subIdx][cellIdx] === value
+								Math.floor(cellIdx / 3) === Math.floor(cell / 3) && this.state.cells[subIdx][cellIdx] === value
 									? true
 									: cellValue
 						)
@@ -213,9 +201,7 @@ export class Game extends Component {
 	findWrongCellsInCol(value, subgrid, cell, wrongCells, causingError) {
 		wrongCells = wrongCells.map(
 			(s, idx) =>
-				idx % 3 === subgrid % 3
-					? wrongCells[idx].map((cellValue, idx) => (idx % 3 === cell % 3 ? true : cellValue))
-					: s
+				idx % 3 === subgrid % 3 ? wrongCells[idx].map((cellValue, idx) => (idx % 3 === cell % 3 ? true : cellValue)) : s
 		);
 		causingError = causingError.map(
 			(s, subIdx) =>
@@ -253,19 +239,6 @@ export class Game extends Component {
 		this.setState({ wrongCells: wrongCells, causingError: causingError });
 	}
 
-	componentDidMount() {
-		this.setState({
-			immutable: this.state.immutable.map((s, subIdx) =>
-				s.map((c, cellIdx) => (this.state.cells[subIdx][cellIdx] ? true : false))
-			)
-		});
-		document.addEventListener('keydown', this.handleKeyDown);
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener('keydown', this.handleKeyDown);
-	}
-
 	clearBoard() {
 		this.setState({
 			cells: this.state.cells.map((s, subIdx) =>
@@ -281,7 +254,7 @@ export class Game extends Component {
 		const originalCells = this.state.cells.map((subgrid, subIdx) =>
 			subgrid.map((cell, cellIdx) => (this.state.immutable[subIdx][cellIdx] ? cell : 0))
 		);
-		const { result, cells } = this.solveNext(originalCells);
+		const { result, cells } = this.solveNext(originalCells, false);
 		if (result) {
 			this.setState({
 				solved: true,
@@ -292,14 +265,18 @@ export class Game extends Component {
 		} else alert('Sorry, but something went wrong!');
 	}
 
-	solveNext(cells) {
+	solveNext(cells, shuffle) {
 		const nextEmptyCell = this.nextEmptyCell(cells);
 		if (!nextEmptyCell) return { result: true, cells: cells };
 		let [ subgrid, cell ] = nextEmptyCell;
-		const solutions = this.cellSolutions(subgrid, cell, cells);
+		let solutions = this.cellSolutions(subgrid, cell, cells);
 		if (!solutions.length) {
 			return { result: false, cells: cells };
 		}
+		// since shuffling costs a lot of time,
+		// it should be used only in making puzzles
+		// but not in solving them
+		solutions = shuffle ? this.shuffle(solutions) : solutions;
 		for (const solution of solutions) {
 			cells[subgrid][cell] = solution;
 			if (this.solveNext(cells).result) return { result: true, cells: cells };
@@ -316,6 +293,70 @@ export class Game extends Component {
 		}
 
 		return null;
+	}
+
+	cellSolutions(subgrid, cell, cells) {
+		let solutions = new Array(9).fill(0).map((_, idx) => idx + 1);
+		const block = this.getBlock(subgrid, cells);
+		const row = this.getRow(subgrid, cell, cells);
+		const col = this.getCol(subgrid, cell, cells);
+		solutions = solutions.filter((c) => !block.includes(c) && !row.includes(c) && !col.includes(c));
+		return solutions;
+	}
+
+	shuffle(arr) {
+		for (let i = arr.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * i);
+			[ arr[i], arr[j] ] = [ arr[j], arr[i] ];
+		}
+		return arr;
+	}
+
+	makeBoard() {
+		let emptyBoard = [
+			[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+			[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+			[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+			[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+			[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+			[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+			[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+			[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+			[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+		];
+		console.log(emptyBoard);
+		let { result, cells } = this.solveAndShuffle(emptyBoard);
+		if (result) {
+			let shuffledKeys = this.shuffle([ ...Array(81).keys() ]);
+			for (let key of shuffledKeys) {
+				const subgrid = Math.floor(key / 9);
+				const cell = key % 9;
+				const cellValue = cells[subgrid][cell];
+				cells[subgrid][cell] = 0;
+				const solutions = this.cellSolutions(subgrid, cell, cells);
+				if (solutions.length !== 1 && solutions.length !== 2) {
+					cells[subgrid][cell] = cellValue;
+				}
+			}
+			const immutable = this.immutableCells(cells);
+			this.setState({
+				cells: cells,
+				immutable: immutable,
+				wrongCells: new Array(9).fill(new Array(9).fill(false)),
+				causingError: new Array(9).fill(new Array(9).fill(false)),
+				solved: false
+			});
+		} else {
+			alert('Something wrong happend while trying to make a board!');
+		}
+	}
+
+	solveAndShuffle(cells) {
+		return this.solveNext(cells, true);
+	}
+
+	immutableCells(cells) {
+		return cells.map((subgrid, subIdx) => subgrid.map((cell, cellIdx) => (cell ? true : false)));
 	}
 
 	hint() {
@@ -338,9 +379,7 @@ export class Game extends Component {
 		const { cells, immutable, hints } = this.state;
 		let hintsFound = false;
 		let solution = cells.map((subgrid, subIdx) =>
-			subgrid.map(
-				(cell, cellIdx) => (!immutable[subIdx][cellIdx] ? this.cellSolutions(subIdx, cellIdx, cells) : [])
-			)
+			subgrid.map((cell, cellIdx) => (!immutable[subIdx][cellIdx] ? this.cellSolutions(subIdx, cellIdx, cells) : []))
 		);
 		for (let subgrid = 0; subgrid < solution.length; subgrid++) {
 			for (let cell = 0; cell < solution[subgrid].length; cell++) {
@@ -359,25 +398,21 @@ export class Game extends Component {
 		const { cells, immutable, hints } = this.state;
 		let hintsFound = false;
 		let solution = cells.map((subgrid, subIdx) =>
-			subgrid.map(
-				(cell, cellIdx) => (!immutable[subIdx][cellIdx] ? this.cellSolutions(subIdx, cellIdx, cells) : [])
-			)
+			subgrid.map((cell, cellIdx) => (!immutable[subIdx][cellIdx] ? this.cellSolutions(subIdx, cellIdx, cells) : []))
 		);
 		let countedSolutions = new Array(9).fill(new Array(9).fill(0));
-		solution.forEach((subgrid, subIdx) =>
-			subgrid.forEach((cell, cellIdx) => (countedSolutions[subIdx][cell] += 1))
-		);
+		solution.forEach((subgrid, subIdx) => subgrid.forEach((cell, cellIdx) => (countedSolutions[subIdx][cell] += 1)));
 		// TODO: find lonely values logic
 		return [ hintsFound, hints ];
 	}
 
-	cellSolutions(subgrid, cell, cells) {
-		let solutions = new Array(9).fill(0).map((_, idx) => idx + 1);
-		const block = this.getBlock(subgrid, cells);
-		const row = this.getRow(subgrid, cell, cells);
-		const col = this.getCol(subgrid, cell, cells);
-		solutions = solutions.filter((c) => !block.includes(c) && !row.includes(c) && !col.includes(c));
-		return solutions;
+	componentDidMount() {
+		this.makeBoard();
+		document.addEventListener('keydown', this.handleKeyDown);
+	}
+
+	componentWillUnmount() {
+		document.removeEventListener('keydown', this.handleKeyDown);
 	}
 
 	render() {
@@ -397,6 +432,9 @@ export class Game extends Component {
 					solved={this.state.solved}
 				/>
 				<div className="HelperButtonsContainer">
+					<button className="HelperButton" onClick={this.makeBoard}>
+						New
+					</button>
 					<button className="HelperButton" onClick={this.clearBoard}>
 						Clear
 					</button>

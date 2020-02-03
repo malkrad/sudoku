@@ -340,7 +340,6 @@ export class Game extends Component {
       [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
       [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
     ];
-    console.log(emptyBoard);
     let { result, cells } = this.solveAndShuffle(emptyBoard);
     if (result) {
       let shuffledKeys = this.shuffle([ ...Array(81).keys() ]);

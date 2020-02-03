@@ -1,68 +1,157 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<style>
+  header {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 15vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
 
-## Available Scripts
+  #title {
+    width: 170px;
+    height: 30px;
+    border: none;
+    outline: none;
+    color: #fff;
+    background: #111;
+    position: relative;
+    z-index: 0;
+    border-radius: 100px;
+  }
 
-In the project directory, you can run:
+  #title:before {
+    content: '';
+    background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    background-size: 400%;
+    z-index: -1;
+    filter: blur(5px);
+    width: calc(100% + 12px);
+    height: calc(100% + 12px);
+    animation: glowing 20s linear infinite;
+    opacity: 0.3;
+    transition: opacity .3s ease-in-out;
+    border-radius: 10px;
+  }
 
-### `npm start`
+  #title:after {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #111;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
+  }
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+  @keyframes glowing {
+    0% {
+      background-position: 0 0;
+    }
+    50% {
+      background-position: 400% 0;
+    }
+    100% {
+      background-position: 0 0;
+    }
+  }
+</style>
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+<br />
+<p align="center">
+  
+  <header>
+    <h1 id="title" align="center">Sudoku JS</h1>
+  </header>
 
-### `npm test`
+  <p align="center">
+    A Sudoku puzzle with solver built in React.
+    <br />
+    <a href="https://malkrad.github.io/sudoku"><strong>Try it yourself »</strong></a>
+    <br />
+  </p>
+</p>
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+<!-- ABOUT THE PROJECT -->
+## About The Project
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+![Product Name Screen Shot](screenshot.jpg "SudokuJS screenshot")
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+A Sudoku puzzle built with ReactJS with a fast implemented solver,\
+I know there are a lot of Sudokus out there, but none looks as beautiful 😎
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+<!-- Features -->
+## Features
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+* **Randomly generated Sudoku puzzles**, that are 100% solvable.
+* Choose the cell you want to change **per click** or the **keyboard arrows**.
+* Simple inputing using the **keybaord numbers** (use 0 to delete a cell).
+* Reset the current puzzle using the **Clear** button.
+* Solve the puzzle with a Backtracking Algorithm using **Solve** button.
+* Make new puzzles using the **New** button.
+* Discover wrong entered values and hinting them.
+* Celebrating correctly solved puzzles :)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+<!-- GETTING STARTED -->
+## Getting Started
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+For a live preview you can visit [Sudoku JS](https://malkrad.github.io/sudoku).
 
-### Code Splitting
+OR
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+You can follow those steps to deploy it locally:
 
-### Analyzing the Bundle Size
+* Clone the project using:
+```
+git clone https://github.com/malkrad/sudoku.git
+```
+* Move into the project folder:
+```
+cd sudoku
+```
+* Install dependencies using:
+```
+npm install
+```
+* Start the local server:
+```
+npm start
+```
+* 🥳🥳🥳, you made it, you can visit [localhost:3000](http://localhost:3000) in your browser to enjoy.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
 
-### Making a Progressive Web App
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+<!-- LICENSE -->
+## License
 
-### Advanced Configuration
+Distributed under the MIT License. See `LICENSE` for more information.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
 
-### Deployment
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+<!-- CONTACT -->
+## Contact
 
-### `npm run build` fails to minify
+Twitter - [@mo_alkrad](https://twitter.com/mo_alkrad)
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+LinkedIn - [@malkrad](https://www.linkedin.com/in/malkrad/)
+
+Project Link: [https://github.com/malkrad/sudoku](https://github.com/malkrad/sudoku)
+
+
+
+<!-- ACKNOWLEDGEMENTS -->
+## Acknowledgement
+* [Best-README-Template](https://github.com/othneildrew/Best-README-Template)

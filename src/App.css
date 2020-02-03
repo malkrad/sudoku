@@ -1,9 +1,9 @@
 body {
-	background-color: rgb(19, 20, 22);
+  background-color: rgb(19, 20, 22);
 }
 
 .App {
-	text-align: center;
-	display: flex;
-	justify-content: center;
+  text-align: center;
+  display: flex;
+  justify-content: center;
 }

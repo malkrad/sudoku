@@ -1,6 +1,6 @@
 .Subgrid {
-	display: Grid;
-	grid-template-columns: repeat(3, 33.33%);
-	grid-template-rows: repeat(3, 33.33%);
-	/* grid-auto-rows: 1fr; */
+  display: Grid;
+  grid-template-columns: repeat(3, 33.33%);
+  grid-template-rows: repeat(3, 33.33%);
+  /* grid-auto-rows: 1fr; */
 }

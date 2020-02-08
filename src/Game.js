@@ -329,17 +329,7 @@ export class Game extends Component {
   }
 
   makeBoard() {
-    let emptyBoard = [
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
-    ];
+    let emptyBoard = Array.from({ length: 9 }).map(() => Array(9).fill(0));
     let { result, cells } = this.solveAndShuffle(emptyBoard);
     if (result) {
       let shuffledKeys = this.shuffle([ ...Array(81).keys() ]);

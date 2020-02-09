@@ -5,11 +5,11 @@ export class Game extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      cells: new Array(9).fill(new Array(9).fill(0)),
-      hints: new Array(9).fill(new Array(9).fill(false)),
-      immutable: new Array(9).fill(new Array(9).fill(false)),
-      wrongCells: new Array(9).fill(new Array(9).fill(false)),
-      causingError: new Array(9).fill(new Array(9).fill(false)),
+      cells: new Array(9).fill().map(() => Array(9).fill(0)),
+      hints: new Array(9).fill().map(() => Array(9).fill(false)),
+      immutable: new Array(9).fill().map(() => Array(9).fill(false)),
+      wrongCells: new Array(9).fill().map(() => Array(9).fill(false)),
+      causingError: new Array(9).fill().map(() => Array(9).fill(false)),
       focusedCell: undefined,
       solved: false
     };
@@ -58,8 +58,8 @@ export class Game extends Component {
 
   checkConflicts() {
     let { cells } = this.state;
-    let wrongCells = new Array(9).fill(new Array(9).fill(false));
-    let causingError = new Array(9).fill(new Array(9).fill(false));
+    let wrongCells = new Array(9).fill().map(() => Array(9).fill(false));
+    let causingError = new Array(9).fill().map(() => Array(9).fill(false));
     cells.forEach((subgrid, subIdx) =>
       subgrid.forEach((cell, cellIdx) => {
         if (cell !== 0) {
@@ -260,8 +260,8 @@ export class Game extends Component {
       cells: this.state.cells.map((s, subIdx) =>
         s.map((c, cellIdx) => (this.state.immutable[subIdx][cellIdx] ? c : 0))
       ),
-      wrongCells: new Array(9).fill(new Array(9).fill(false)),
-      causingError: new Array(9).fill(new Array(9).fill(false)),
+      wrongCells: new Array(9).fill().map(() => Array(9).fill(false)),
+      causingError: new Array(9).fill().map(() => Array(9).fill(false)),
       solved: false
     });
   }
@@ -275,8 +275,8 @@ export class Game extends Component {
       this.setState({
         solved: true,
         cells: cells,
-        wrongCells: new Array(9).fill(new Array(9).fill(false)),
-        causingError: new Array(9).fill(new Array(9).fill(false))
+        wrongCells: new Array(9).fill().map(() => Array(9).fill(false)),
+        causingError: new Array(9).fill().map(() => Array(9).fill(false))
       });
     } else alert('Sorry, but something went wrong!');
   }
@@ -347,8 +347,8 @@ export class Game extends Component {
       this.setState({
         cells: cells,
         immutable: immutable,
-        wrongCells: new Array(9).fill(new Array(9).fill(false)),
-        causingError: new Array(9).fill(new Array(9).fill(false)),
+        wrongCells: new Array(9).fill().map(() => Array(9).fill(false)),
+        causingError: new Array(9).fill().map(() => Array(9).fill(false)),
         solved: false
       });
     } else {
@@ -367,7 +367,7 @@ export class Game extends Component {
   hint() {
     const [ foundLonelyCells, lonelyCells ] = this.findLonelyCells();
     const [ foundLonelyValues, lonelyValues ] = this.findLonelyValues();
-    let hints = new Array(9).fill(new Array(9).fill(false));
+    let hints = new Array(9).fill().map(() => Array(9).fill(false));
     hints = hints.map((subgrid, subIdx) =>
       subgrid.map((cell, cellIdx) => lonelyCells[subIdx][cellIdx] || lonelyValues[subIdx][cellIdx])
     );
@@ -405,7 +405,7 @@ export class Game extends Component {
     let solution = cells.map((subgrid, subIdx) =>
       subgrid.map((cell, cellIdx) => (!immutable[subIdx][cellIdx] ? this.cellSolutions(subIdx, cellIdx, cells) : []))
     );
-    let countedSolutions = new Array(9).fill(new Array(9).fill(0));
+    let countedSolutions = new Array(9).fill().map(() => Array(9).fill(0));
     solution.forEach((subgrid, subIdx) => subgrid.forEach((cell, cellIdx) => (countedSolutions[subIdx][cell] += 1)));
     // TODO: find lonely values logic
     return [ hintsFound, hints ];
